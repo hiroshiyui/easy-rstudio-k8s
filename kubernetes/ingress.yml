@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: easy-rstudio-user-default-ingress
+spec:
+  rules:
+  - host: easy-rstudio
+    http:
+      paths:
+      - backend:
+          serviceName: easy-rstudio-user-default-service
+          servicePort: 80
