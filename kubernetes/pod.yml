@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: easy-rstudio-pod
+  namespace: easy-rstudio
   labels:
     app: easy-rstudio
 spec:

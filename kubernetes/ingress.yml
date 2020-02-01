@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: easy-rstudio-user-default-ingress
+  namespace: easy-rstudio
 spec:
   rules:
   - host: easy-rstudio

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: easy-rstudio-user-default-deployment
+  namespace: easy-rstudio
 spec:
   selector:
     matchLabels:
