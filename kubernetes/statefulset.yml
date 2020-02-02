@@ -8,6 +8,9 @@ kind: Service
 metadata:
   name: easy-rstudio-user-default-service
   namespace: easy-rstudio
+  labels:
+    app: easy-rstudio
+    user: default
 spec:
   selector:
     app: easy-rstudio
@@ -60,6 +63,9 @@ kind: Ingress
 metadata:
   name: easy-rstudio-user-default-ingress
   namespace: easy-rstudio
+  labels:
+    app: easy-rstudio
+    user: default
 spec:
   rules:
   - host: easy-rstudio
