@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: easy-rstudio
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: easy-rstudio-user-default-service
+  namespace: easy-rstudio
+spec:
+  selector:
+    app: easy-rstudio
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8787
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: easy-rstudio-stateful-set
+  namespace: easy-rstudio
+spec:
+  serviceName: easy-rstudio-user-default-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: easy-rstudio
+  template:
+    metadata:
+      labels:
+        app: easy-rstudio
+        user: default
+    spec:
+      containers:
+      - name: easy-rstudio-container
+        image: rocker/rstudio
+        env:
+        - name: ROOT
+          value: "true"
+        - name: PASSWORD
+          value: "easy-rstudio"
+        ports:
+        - containerPort: 8787
+        volumeMounts:
+        - name: user-assets
+          mountPath: /home/rstudio/my-files
+  volumeClaimTemplates:
+  - metadata:
+      name: user-assets
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: easy-rstudio-user-default-ingress
+  namespace: easy-rstudio
+spec:
+  rules:
+  - host: easy-rstudio
+    http:
+      paths:
+      - backend:
+          serviceName: easy-rstudio-user-default-service
+          servicePort: 80
