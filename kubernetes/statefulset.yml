@@ -14,6 +14,24 @@ metadata:
 spec:
   selector:
     app: easy-rstudio
+    user: default
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8787
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: easy-rstudio-user-johndoe-service
+  namespace: easy-rstudio
+  labels:
+    app: easy-rstudio
+    user: johndoe
+spec:
+  selector:
+    app: easy-rstudio
+    user: johndoe
   ports:
     - protocol: TCP
       port: 80
@@ -22,14 +40,18 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: easy-rstudio-stateful-set
+  name: easy-rstudio-user-default-stateful-set
   namespace: easy-rstudio
+  labels:
+    app: easy-rstudio
+    user: default
 spec:
   serviceName: easy-rstudio-user-default-service
   replicas: 1
   selector:
     matchLabels:
       app: easy-rstudio
+      user: default
   template:
     metadata:
       labels:
@@ -58,6 +80,49 @@ spec:
         requests:
           storage: 1Gi
 ---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: easy-rstudio-user-johndoe-stateful-set
+  namespace: easy-rstudio
+  labels:
+    app: easy-rstudio
+    user: johndoe
+spec:
+  serviceName: easy-rstudio-user-johndoe-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: easy-rstudio
+      user: johndoe
+  template:
+    metadata:
+      labels:
+        app: easy-rstudio
+        user: johndoe
+    spec:
+      containers:
+      - name: easy-rstudio-container
+        image: rocker/rstudio
+        env:
+        - name: ROOT
+          value: "true"
+        - name: PASSWORD
+          value: "easy-rstudio-johndoe"
+        ports:
+        - containerPort: 8787
+        volumeMounts:
+        - name: user-assets
+          mountPath: /home/rstudio/my-files
+  volumeClaimTemplates:
+  - metadata:
+      name: user-assets
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -68,9 +133,26 @@ metadata:
     user: default
 spec:
   rules:
-  - host: easy-rstudio
+  - host: easy-rstudio-default
     http:
       paths:
       - backend:
           serviceName: easy-rstudio-user-default-service
+          servicePort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: easy-rstudio-user-johndoe-ingress
+  namespace: easy-rstudio
+  labels:
+    app: easy-rstudio
+    user: johndoe
+spec:
+  rules:
+  - host: easy-rstudio-johndoe
+    http:
+      paths:
+      - backend:
+          serviceName: easy-rstudio-user-johndoe-service
           servicePort: 80

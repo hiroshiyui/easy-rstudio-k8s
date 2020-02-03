@@ -2,13 +2,15 @@
 
 ## TL;DR
 
+### Minikube setup example
+
 1. Edit `/etc/hosts`, add one line such as:
 
     ```
-    ${INGRESS_IP_ADDRESS}   easy-rstudio
+    ${INGRESS_IP_ADDRESS}   easy-rstudio-default    easy-rstudio-johndoe
     ```
 
-   If you are evaluating this in Minikube, the `${INGRESS_IP_ADDRESS}` would be available by running:
+   The value of `${INGRESS_IP_ADDRESS}` would be available by running:
 
     > minikube ip
 
@@ -16,7 +18,7 @@
 
     > kubectl apply -f kubernetes/statefulset.yml
 
-3. Access RStudio at http://easy-rstudio
+3. Access RStudio at http://easy-rstudio-default and http://easy-rstudio-johndoe
 
 ## NOTICE
 
